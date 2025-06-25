@@ -19,6 +19,15 @@
 #define USE_STD_FUNCTION
 
 /**
+ * Decomment below line to enable std::function as callbacks
+*/
+#define USE_PCF8574
+
+#if defined(USE_PCF8574)
+#include <PCF8574.h>
+#endif
+
+/**
  * Decomment below line to disable double press and receive press event immediately
 */
 // #define DISABLE_DOUBLE_PRESS
@@ -71,6 +80,10 @@ class Versatile_RotaryEncoder {
         uint32_t last_switchdown;
         uint32_t last_switchup;
         bool check_double_press = false;
+
+        #if defined(USE_PCF8574)
+        PCF8574 *pcf8574;
+        #endif
         
         Rotary rotary = stopped;
         Button button = released;
@@ -88,7 +101,11 @@ class Versatile_RotaryEncoder {
         functionHandleButton handleDoublePressRelease = nullptr;
 
     public:
+        #if defined(USE_PCF8574)
+        Versatile_RotaryEncoder(uint8_t clk, uint8_t dt, uint8_t sw, PCF8574 *pcf8574);
+        #else
         Versatile_RotaryEncoder(uint8_t clk, uint8_t dt, uint8_t sw);
+        #endif
         bool ReadEncoder();
         void setInvertedSwitch(bool invert_switch);
         void setReadIntervalDuration(uint8_t duration);

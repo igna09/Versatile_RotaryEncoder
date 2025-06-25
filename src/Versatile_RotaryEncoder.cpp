@@ -12,6 +12,19 @@
 */
 #include "Versatile_RotaryEncoder.h"
 
+#if defined(USE_PCF8574)
+Versatile_RotaryEncoder::Versatile_RotaryEncoder(uint8_t clk, uint8_t dt, uint8_t sw, PCF8574 *pcf8574) {
+    pin_clk = clk;
+    pin_dt = dt;
+    pin_sw = sw;
+    this->pcf8574 = pcf8574;
+
+    // Set encoder pins as inputs
+    this->pcf8574->pinMode(pin_clk, INPUT_TYPE);
+    this->pcf8574->pinMode(pin_dt, INPUT_TYPE);
+    this->pcf8574->pinMode(pin_sw, INPUT_TYPE);
+}
+#else
 Versatile_RotaryEncoder::Versatile_RotaryEncoder(uint8_t clk, uint8_t dt, uint8_t sw) {
     
     pin_clk = clk;
@@ -23,6 +36,7 @@ Versatile_RotaryEncoder::Versatile_RotaryEncoder(uint8_t clk, uint8_t dt, uint8_
     pinMode(pin_dt, INPUT_TYPE);
     pinMode(pin_sw, INPUT_TYPE);
 }
+#endif
 
 bool Versatile_RotaryEncoder::ReadEncoder() {
 
@@ -30,7 +44,11 @@ bool Versatile_RotaryEncoder::ReadEncoder() {
     
     if (millis() - last_encoder_read >= (uint32_t)read_interval_duration) {
         last_encoder_read = millis();
+        #if defined(USE_PCF8574)
+        encoderBits = (inverted_switch^this->pcf8574->digitalRead(pin_sw)) << 2 | this->pcf8574->digitalRead(pin_clk) << 1 | this->pcf8574->digitalRead(pin_dt);
+        #else
         encoderBits = (inverted_switch^digitalRead(pin_sw)) << 2 | digitalRead(pin_clk) << 1 | digitalRead(pin_dt);
+        #endif
 
         // ROTARY READ
         if ((rotaryBits & 0b11) != (encoderBits & 0b11)) {
