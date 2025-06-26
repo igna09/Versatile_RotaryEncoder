@@ -107,6 +107,7 @@ class Versatile_RotaryEncoder {
         Versatile_RotaryEncoder(uint8_t clk, uint8_t dt, uint8_t sw);
         #endif
         bool ReadEncoder();
+        uint8_t getDigitalInputValue(PCF8574::DigitalInput digitalInput, uint8_t pin);
         void setInvertedSwitch(bool invert_switch);
         void setReadIntervalDuration(uint8_t duration);
         void setShortPressDuration(uint8_t duration);
